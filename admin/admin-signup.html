@@ -71,20 +71,23 @@ a{
 <script type="module">
 import { adminSignup } from "../js/auth.js";
 
-const base = "/SevaSphere";
+const base = "/SevaSphere_Final";  // your repo name
 
 document.getElementById("signupForm").addEventListener("submit", async (e)=>{
-e.preventDefault();
+    e.preventDefault();
 
-const result = await adminSignup(name.value,email.value,password.value);
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-if(result.success){
-window.location.href = base + "/admin/admin-dashboard.html";
-}else{
-alert(result.error);
-}
+    const result = await adminSignup(name, email, password);
+
+    if(result.success){
+        window.location.href = base + "/admin/admin-dashboard.html";
+    }else{
+        alert(result.error);
+    }
 });
 </script>
-
 </body>
 </html>
