@@ -114,38 +114,43 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const loginForm = document.getElementById("loginForm");
+const errorBox = document.getElementById("error");
+const successBox = document.getElementById("success");
 
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  errorBox.innerText = "";
+  successBox.innerText = "";
+
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
-try {
-  const userCred = await signInWithEmailAndPassword(auth, email, password);
-  const userDoc = await getDoc(doc(db, "users", userCred.user.uid));
+  try {
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+    const userDoc = await getDoc(doc(db, "users", userCred.user.uid));
 
-  if (!userDoc.exists()) {
-    errorBox.innerText = "User data not found in Firestore!";
-    return;
+    if (!userDoc.exists()) {
+      errorBox.innerText = "User data not found in Firestore!";
+      return;
+    }
+
+    if (userDoc.data().role !== "admin") {
+      errorBox.innerText = "You are not registered as an Admin!";
+      return;
+    }
+
+    successBox.innerText = "Login successful! Redirecting...";
+    setTimeout(() => {
+      window.location.href = "admin-dashboard.html";
+    }, 700);
+
+  } catch (error) {
+    errorBox.innerText = error.message;
   }
-
-  if (userDoc.data().role !== "admin") {
-    errorBox.innerText = "You are not registered as an Admin!";
-    return;
-  }
-
-  successBox.innerText = "Login successful! Redirecting...";
-  setTimeout(() => {
-    window.location.href = "admin-dashboard.html";
-  }, 700);
-
-} catch (error) {
-  errorBox.innerText = error.message;
-}
-
 });
 </script>
+
 
 </body>
 </html>
