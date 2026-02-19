@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events Feed - SevaSphere</title>
+  <link rel="stylesheet" href="events-feed.css" />
+</head>
+
+<body>
+
+  <div class="wrap">
+
+    <div class="top">
+      <h1>🗂 Events Feed</h1>
+      <p>Search + Filter + Save events (Frontend only)</p>
+      <a class="back" href="../volunteer-dashboard.html">← Back</a>
+    </div>
+
+    <div class="filters">
+      <input id="searchInput" type="text" placeholder="Search event name..." />
+
+      <select id="categoryFilter">
+        <option value="all">All Categories</option>
+        <option value="Tree Plantation">Tree Plantation</option>
+        <option value="Beach Cleanup">Beach Cleanup</option>
+        <option value="Blood Donation">Blood Donation</option>
+        <option value="Teaching">Teaching</option>
+        <option value="Food Distribution">Food Distribution</option>
+      </select>
+
+      <select id="cityFilter">
+        <option value="all">All Cities</option>
+        <option value="Goa">Goa</option>
+        <option value="Mumbai">Mumbai</option>
+        <option value="Pune">Pune</option>
+        <option value="Bangalore">Bangalore</option>
+      </select>
+
+      <button id="clearBtn">Clear</button>
+    </div>
+
+    <div class="row">
+      <h2>Available Events</h2>
+      <button id="showSavedBtn">⭐ View Saved Events</button>
+    </div>
+
+    <div id="eventsList" class="grid"></div>
+
+    <div id="emptyMsg" class="empty">No events found.</div>
+
+  </div>
+
+  <script src="events-feed.js"></script>
+</body>
+</html>

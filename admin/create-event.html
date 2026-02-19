@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create Event | SevaSphere</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <h2 style="text-align:center;">NGO - Create Event</h2>
+
+  <div style="width:60%; margin:auto;">
+    <input id="title" placeholder="Event Title"><br><br>
+    <input id="category" placeholder="Category (Tree Plantation, Teaching...)"><br><br>
+    <input id="location" placeholder="Location"><br><br>
+    <input id="date" type="date"><br><br>
+    <input id="time" placeholder="Time (08:00 AM)"><br><br>
+    <input id="ngo" placeholder="NGO Name"><br><br>
+    <textarea id="description" placeholder="Event Description"></textarea><br><br>
+
+    <button onclick="createEvent()">Create Event</button>
+  </div>
+
+  <script src="../assets/js/data.js"></script>
+
+  <script>
+    function createEvent() {
+      let events = JSON.parse(localStorage.getItem("events")) || [];
+
+      let newEvent = {
+        id: Date.now(),
+        title: document.getElementById("title").value,
+        category: document.getElementById("category").value,
+        location: document.getElementById("location").value,
+        date: document.getElementById("date").value,
+        time: document.getElementById("time").value,
+        ngo: document.getElementById("ngo").value,
+        description: document.getElementById("description").value,
+        volunteersApplied: []
+      };
+
+      events.push(newEvent);
+      localStorage.setItem("events", JSON.stringify(events));
+
+      alert("Event Created Successfully!");
+      window.location.reload();
+    }
+  </script>
+
+</body>
+</html>

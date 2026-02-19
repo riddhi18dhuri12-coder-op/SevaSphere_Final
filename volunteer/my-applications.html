@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Applications | SevaSphere</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <h2 style="text-align:center;">My Applications</h2>
+
+  <div id="applicationsContainer" style="width:80%; margin:auto;"></div>
+
+  <script src="../assets/js/data.js"></script>
+
+  <script>
+    const container = document.getElementById("applicationsContainer");
+
+    function loadApplications() {
+      let events = JSON.parse(localStorage.getItem("events")) || [];
+      let applications = JSON.parse(localStorage.getItem("applications")) || [];
+
+      container.innerHTML = "";
+
+      if (applications.length === 0) {
+        container.innerHTML = "<p style='text-align:center;'>No applications yet.</p>";
+        return;
+      }
+
+      applications.forEach(app => {
+        let event = events.find(e => e.id === app.eventId);
+
+        let div = document.createElement("div");
+        div.style.border = "1px solid #ccc";
+        div.style.padding = "15px";
+        div.style.marginBottom = "15px";
+        div.style.borderRadius = "10px";
+
+        div.innerHTML = `
+          <h3>${event.title}</h3>
+          <p><b>Category:</b> ${event.category}</p>
+          <p><b>Date:</b> ${event.date}</p>
+          <p><b>Status:</b> ${app.status}</p>
+          <p><b>Applied At:</b> ${app.appliedAt}</p>
+        `;
+
+        container.appendChild(div);
+      });
+    }
+
+    loadApplications();
+  </script>
+
+</body>
+</html>

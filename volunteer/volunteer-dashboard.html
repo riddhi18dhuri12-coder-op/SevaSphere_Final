@@ -17,67 +17,352 @@ body{
 }
 .sidebar{
     width:260px;
-    background:rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.12);
     backdrop-filter:blur(15px);
     padding:25px;
     color:white;
 }
 .sidebar h2{
     margin-bottom:30px;
+    font-size:22px;
 }
 .sidebar a{
     display:block;
     color:white;
     text-decoration:none;
     padding:10px 0;
+    font-size:16px;
+    opacity:0.95;
+}
+.sidebar a:hover{
+    opacity:1;
+    text-decoration:underline;
 }
 .main{
     flex:1;
     padding:40px;
     background:#f5f5f5;
 }
+.topBar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+}
+.profileBox{
+    background:white;
+    padding:18px 22px;
+    border-radius:12px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.08);
+    margin:20px 0;
+}
+.profileBox h2{
+    margin:0;
+    font-size:20px;
+}
+.profileBox p{
+    margin:6px 0 0;
+    color:#444;
+}
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:18px;
+    margin-top:20px;
+}
 .card{
     background:white;
     padding:20px;
     border-radius:12px;
     box-shadow:0 5px 20px rgba(0,0,0,0.1);
-    margin-bottom:20px;
 }
-.logout{
+.card h3{
+    margin:0;
+    font-size:16px;
+    color:#555;
+}
+.card h2{
+    margin:12px 0 0;
+    font-size:34px;
+    color:#F57C00;
+}
+.actionButtons{
+    margin-top:25px;
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+}
+.btn{
+    border:none;
+    padding:12px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:15px;
+}
+.btnPrimary{
     background:#F57C00;
     color:white;
+}
+.btnSecondary{
+    background:#fff;
+    color:#F57C00;
+    border:2px solid #F57C00;
+}
+.btn:hover{
+    opacity:0.9;
+}
+
+/* ========================= */
+/* ✅ NEW EVENT FEED SECTION */
+/* ========================= */
+
+.feedSection{
+    margin-top:35px;
+}
+
+.feedHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:12px;
+}
+
+.feedHeader h2{
+    margin:0;
+    font-size:22px;
+}
+
+.savedBtn{
+    background:#1b1b1b;
+    color:white;
     border:none;
-    padding:8px 15px;
-    border-radius:6px;
+    padding:10px 14px;
+    border-radius:10px;
     cursor:pointer;
+    font-weight:700;
+}
+
+.filters{
+    display:grid;
+    grid-template-columns: 1.4fr 1fr 1fr 0.5fr;
+    gap:10px;
+    margin-bottom:18px;
+}
+
+.filters input, .filters select{
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    outline:none;
+    font-size:14px;
+}
+
+.filters button{
+    border:none;
+    border-radius:10px;
+    font-weight:800;
+    cursor:pointer;
+    background:#1b1b1b;
+    color:white;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:14px;
+}
+
+.eventCard{
+    background:white;
+    padding:16px;
+    border-radius:16px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.12);
+}
+
+.eventCard h3{
+    margin-bottom:8px;
+    font-size:17px;
+}
+
+.tags{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+}
+
+.tag{
+    background:#fff1e3;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:800;
+    border:1px solid rgba(255,152,0,0.35);
+}
+
+.meta{
+    font-size:13px;
+    margin-top:6px;
+    opacity:0.9;
+    color:#333;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+}
+
+.actions button{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:900;
+}
+
+.apply{
+    background:#FF9800;
+    color:white;
+}
+
+.save{
+    background:#1b1b1b;
+    color:white;
+}
+
+.empty{
+    margin-top:20px;
+    text-align:center;
+    display:none;
+    font-weight:800;
+    color:#444;
+}
+
+@media(max-width:900px){
+    .grid{
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width:600px){
+    .filters{
+        grid-template-columns:1fr;
+    }
+    .grid{
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 </head>
+
 <body>
 
 <div class="dashboard">
+
     <div class="sidebar">
         <h2>🌍 SevaSphere</h2>
-        <a href="#">Dashboard</a>
+
+        <a href="volunteer-dashboard.html">Dashboard</a>
         <a href="events.html">Browse Events</a>
+        <a href="my-applications.html">My Applications</a>
+
+        <!-- Keep Certificate Generator -->
+        <a href="certificates/certificate.html">🎓 Certificate Generator</a>
+
+        <br>
         <a href="#" id="logoutBtn">Logout</a>
     </div>
 
     <div class="main">
-        <h1>Volunteer Dashboard</h1>
-        <div id="volunteerName">Loading...</div>
 
-        <div class="card">
-            <h3>Available Events</h3>
-            <h2 id="totalEvents">0</h2>
+        <div class="topBar">
+            <h1 style="margin:0;">Volunteer Dashboard</h1>
         </div>
+
+        <div class="profileBox">
+            <h2 id="volunteerName">Loading...</h2>
+            <p>Welcome to SevaSphere 💛 Choose events, apply, and track your participation.</p>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <h3>Total Events Available</h3>
+                <h2 id="totalEvents">0</h2>
+            </div>
+
+            <div class="card">
+                <h3>Upcoming Events</h3>
+                <h2 id="upcomingEvents">0</h2>
+            </div>
+
+            <div class="card">
+                <h3>My Applications</h3>
+                <h2 id="myApplications">0</h2>
+            </div>
+        </div>
+
+        <div class="actionButtons">
+            <button class="btn btnPrimary" onclick="window.location.href='events.html'">
+                Browse Events
+            </button>
+
+            <button class="btn btnSecondary" onclick="window.location.href='my-applications.html'">
+                View My Applications
+            </button>
+        </div>
+
+        <!-- ✅ NEW EVENT FEED SECTION INSIDE DASHBOARD -->
+        <div class="feedSection">
+
+            <div class="feedHeader">
+                <h2>🗂 Smart Events Feed</h2>
+                <button class="savedBtn" id="showSavedBtn">⭐ View Saved Events</button>
+            </div>
+
+            <div class="filters">
+                <input id="searchInput" type="text" placeholder="Search event name..." />
+
+                <select id="categoryFilter">
+                    <option value="all">All Categories</option>
+                    <option value="Tree Plantation">Tree Plantation</option>
+                    <option value="Beach Cleanup">Beach Cleanup</option>
+                    <option value="Blood Donation">Blood Donation</option>
+                    <option value="Teaching">Teaching</option>
+                    <option value="Food Distribution">Food Distribution</option>
+                </select>
+
+                <select id="cityFilter">
+                    <option value="all">All Cities</option>
+                    <option value="Goa">Goa</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Pune">Pune</option>
+                    <option value="Bangalore">Bangalore</option>
+                </select>
+
+                <button id="clearBtn">Clear</button>
+            </div>
+
+            <div id="eventsList" class="grid"></div>
+            <div id="emptyMsg" class="empty">No events found.</div>
+
+        </div>
+
     </div>
+
 </div>
+
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { 
+    getFirestore, collection, getDocs, doc, getDoc, query, where 
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-z1Zx-0qAj6_FGiclcXFdIjiKSjXlUKw",
@@ -92,29 +377,214 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Helper: count upcoming events
+function isUpcoming(dateStr){
+    if(!dateStr) return false;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const eventDate = new Date(dateStr);
+    eventDate.setHours(0,0,0,0);
+
+    return eventDate >= today;
+}
+
 onAuthStateChanged(auth, async (user)=>{
+
     if(!user){
         window.location.href="volunteer-login.html";
         return;
     }
 
+    // Check user role
     const userDoc = await getDoc(doc(db,"users",user.uid));
 
-    if(!userDoc.exists() || userDoc.data().role!=="volunteer"){
+    if(!userDoc.exists() || userDoc.data().role !== "volunteer"){
         window.location.href="../index.html";
         return;
     }
 
-    document.getElementById("volunteerName").innerText=userDoc.data().name;
+    // Show volunteer name
+    document.getElementById("volunteerName").innerText = "Hi, " + userDoc.data().name + " 👋";
 
-    const events = await getDocs(collection(db,"events"));
-    document.getElementById("totalEvents").innerText=events.size;
+    // Fetch events from Firestore (for counts)
+    const eventsSnapshot = await getDocs(collection(db,"events"));
+    document.getElementById("totalEvents").innerText = eventsSnapshot.size;
+
+    // Count upcoming events
+    let upcomingCount = 0;
+    eventsSnapshot.forEach((docItem)=>{
+        const ev = docItem.data();
+        if(isUpcoming(ev.date)) upcomingCount++;
+    });
+    document.getElementById("upcomingEvents").innerText = upcomingCount;
+
+    // Fetch volunteer applications
+    try{
+        const appsQuery = query(
+            collection(db, "applications"),
+            where("volunteerId", "==", user.uid)
+        );
+
+        const appsSnap = await getDocs(appsQuery);
+        document.getElementById("myApplications").innerText = appsSnap.size;
+    }catch(err){
+        document.getElementById("myApplications").innerText = 0;
+        console.log("Applications not found yet:", err.message);
+    }
 });
 
-document.getElementById("logoutBtn").addEventListener("click",()=>{
-    signOut(auth);
+document.getElementById("logoutBtn").addEventListener("click", async (e)=>{
+    e.preventDefault();
+    await signOut(auth);
     window.location.href="../index.html";
 });
+
+
+/* ================================================= */
+/* ✅ NEW EVENT FEED LOGIC (FRONTEND INSIDE DASHBOARD) */
+/* ================================================= */
+
+// Dummy events (frontend feed)
+const demoEvents = [
+  { id: 1, name: "Tree Plantation Drive - Panaji", category: "Tree Plantation", city: "Goa", date: "2026-03-01", ngo: "Green Earth Foundation" },
+  { id: 2, name: "Beach Cleanup - Baga", category: "Beach Cleanup", city: "Goa", date: "2026-03-05", ngo: "Ocean Care NGO" },
+  { id: 3, name: "Blood Donation Camp", category: "Blood Donation", city: "Mumbai", date: "2026-03-10", ngo: "Life Saver Trust" },
+  { id: 4, name: "Teaching Kids - Weekend", category: "Teaching", city: "Pune", date: "2026-03-12", ngo: "Bright Future NGO" },
+  { id: 5, name: "Food Distribution Drive", category: "Food Distribution", city: "Bangalore", date: "2026-03-15", ngo: "Helping Hands" },
+  { id: 6, name: "Tree Plantation - City Park", category: "Tree Plantation", city: "Mumbai", date: "2026-03-20", ngo: "Green Earth Foundation" },
+];
+
+const eventsList = document.getElementById("eventsList");
+const emptyMsg = document.getElementById("emptyMsg");
+
+const searchInput = document.getElementById("searchInput");
+const categoryFilter = document.getElementById("categoryFilter");
+const cityFilter = document.getElementById("cityFilter");
+const clearBtn = document.getElementById("clearBtn");
+const showSavedBtn = document.getElementById("showSavedBtn");
+
+function getSavedEvents(){
+  return JSON.parse(localStorage.getItem("sevasphere_saved_events")) || [];
+}
+
+function saveEvent(eventObj){
+  const saved = getSavedEvents();
+  if(!saved.find(e => e.id === eventObj.id)){
+    saved.push(eventObj);
+    localStorage.setItem("sevasphere_saved_events", JSON.stringify(saved));
+  }
+}
+
+function removeSavedEvent(eventId){
+  let saved = getSavedEvents();
+  saved = saved.filter(e => e.id !== eventId);
+  localStorage.setItem("sevasphere_saved_events", JSON.stringify(saved));
+}
+
+function isSaved(eventId){
+  return getSavedEvents().some(e => e.id === eventId);
+}
+
+function renderEvents(list){
+  eventsList.innerHTML = "";
+
+  if(list.length === 0){
+    emptyMsg.style.display = "block";
+    return;
+  }else{
+    emptyMsg.style.display = "none";
+  }
+
+  list.forEach(ev => {
+    const card = document.createElement("div");
+    card.className = "eventCard";
+
+    card.innerHTML = `
+      <h3>${ev.name}</h3>
+
+      <div class="tags">
+        <span class="tag">${ev.category}</span>
+        <span class="tag">${ev.city}</span>
+      </div>
+
+      <div class="meta"><b>NGO:</b> ${ev.ngo}</div>
+      <div class="meta"><b>Date:</b> ${ev.date}</div>
+
+      <div class="actions">
+        <button class="apply">Apply</button>
+        <button class="save">${isSaved(ev.id) ? "★ Saved" : "☆ Save"}</button>
+      </div>
+    `;
+
+    // Apply demo
+    card.querySelector(".apply").addEventListener("click", () => {
+      alert(`✅ Applied for: ${ev.name}\n(Frontend demo only)`);
+    });
+
+    // Save toggle
+    const saveBtn = card.querySelector(".save");
+    saveBtn.addEventListener("click", () => {
+      if(isSaved(ev.id)){
+        removeSavedEvent(ev.id);
+        saveBtn.innerText = "☆ Save";
+      }else{
+        saveEvent(ev);
+        saveBtn.innerText = "★ Saved";
+      }
+    });
+
+    eventsList.appendChild(card);
+  });
+}
+
+function applyFilters(){
+  const searchText = searchInput.value.toLowerCase().trim();
+  const category = categoryFilter.value;
+  const city = cityFilter.value;
+
+  let filtered = [...demoEvents];
+
+  if(searchText){
+    filtered = filtered.filter(e => e.name.toLowerCase().includes(searchText));
+  }
+
+  if(category !== "all"){
+    filtered = filtered.filter(e => e.category === category);
+  }
+
+  if(city !== "all"){
+    filtered = filtered.filter(e => e.city === city);
+  }
+
+  renderEvents(filtered);
+}
+
+searchInput.addEventListener("input", applyFilters);
+categoryFilter.addEventListener("change", applyFilters);
+cityFilter.addEventListener("change", applyFilters);
+
+clearBtn.addEventListener("click", () => {
+  searchInput.value = "";
+  categoryFilter.value = "all";
+  cityFilter.value = "all";
+  renderEvents(demoEvents);
+});
+
+showSavedBtn.addEventListener("click", () => {
+  const saved = getSavedEvents();
+  renderEvents(saved);
+
+  if(saved.length > 0){
+    alert("⭐ Showing Saved Events (Wishlist)");
+  }else{
+    alert("No saved events yet.");
+  }
+});
+
+// Initial render
+renderEvents(demoEvents);
+
 </script>
 
 </body>

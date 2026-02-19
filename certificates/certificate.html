@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Certificate Generator - SevaSphere</title>
+  <link rel="stylesheet" href="certificate.css" />
+
+  <!-- html2canvas CDN (for downloading certificate as image) -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+
+<body>
+
+  <div class="page">
+
+    <div class="left">
+      <h1>🎓 Certificate Generator</h1>
+      <p class="sub">
+        Generate a volunteer certificate instantly and download it (frontend-only).
+      </p>
+
+      <div class="form">
+        <label>Volunteer Name</label>
+        <input type="text" id="volName" placeholder="Eg: Shruti Gaonkar" />
+
+        <label>Event Name</label>
+        <input type="text" id="eventName" placeholder="Eg: Tree Plantation Drive" />
+
+        <label>Event Date</label>
+        <input type="date" id="eventDate" />
+
+        <label>Hours Completed</label>
+        <input type="number" id="hours" placeholder="Eg: 4" min="1" />
+
+        <label>NGO Name</label>
+        <input type="text" id="ngoName" placeholder="Eg: Green Earth Foundation" />
+
+        <div class="btnRow">
+          <button id="generateBtn">Generate</button>
+          <button class="secondary" id="resetBtn">Reset</button>
+        </div>
+
+        <button class="download" id="downloadBtn">⬇ Download Certificate (PNG)</button>
+
+        <p class="note">
+          Tip: This works without backend. You can later connect it to database.
+        </p>
+
+        <a class="back" href="../volunteer-dashboard.html">← Back to Dashboard</a>
+      </div>
+    </div>
+
+    <div class="right">
+      <h2>Live Preview</h2>
+
+      <div class="previewWrap">
+        <div id="certificate" class="certificate">
+
+          <div class="top">
+            <div class="logo">🌍 SevaSphere</div>
+            <div class="badge">VOLUNTEER</div>
+          </div>
+
+          <div class="title">CERTIFICATE OF APPRECIATION</div>
+
+          <div class="line"></div>
+
+          <div class="text">
+            This certificate is proudly presented to
+          </div>
+
+          <div class="name" id="certName">Your Name</div>
+
+          <div class="text">
+            for successfully participating in the event
+          </div>
+
+          <div class="event" id="certEvent">Event Name</div>
+
+          <div class="details">
+            <div>
+              <div class="label">Date</div>
+              <div class="value" id="certDate">--/--/----</div>
+            </div>
+
+            <div>
+              <div class="label">Hours</div>
+              <div class="value" id="certHours">0</div>
+            </div>
+
+            <div>
+              <div class="label">Issued By</div>
+              <div class="value" id="certNgo">NGO Name</div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <div class="sign">
+              <div class="sigLine"></div>
+              <div class="sigText">NGO Coordinator</div>
+            </div>
+
+            <div class="idBox">
+              Certificate ID:
+              <span id="certId">SEVA-XXXXXX</span>
+            </div>
+
+            <div class="sign">
+              <div class="sigLine"></div>
+              <div class="sigText">Platform Admin</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="certificate.js"></script>
+</body>
+</html>

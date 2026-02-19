@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>View Volunteers | SevaSphere</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <h2 style="text-align:center;">NGO - Volunteer Applications</h2>
+
+  <div id="volunteersContainer" style="width:80%; margin:auto;"></div>
+
+  <script src="../assets/js/data.js"></script>
+
+  <script>
+    const container = document.getElementById("volunteersContainer");
+
+    function loadVolunteers() {
+      let events = JSON.parse(localStorage.getItem("events")) || [];
+      let applications = JSON.parse(localStorage.getItem("applications")) || [];
+
+      container.innerHTML = "";
+
+      events.forEach(event => {
+        let eventApps = applications.filter(app => app.eventId === event.id);
+
+        let div = document.createElement("div");
+        div.style.border = "1px solid #ccc";
+        div.style.padding = "15px";
+        div.style.marginBottom = "15px";
+        div.style.borderRadius = "10px";
+
+        div.innerHTML = `
+          <h3>${event.title}</h3>
+          <p><b>Total Applications:</b> ${eventApps.length}</p>
+        `;
+
+        container.appendChild(div);
+      });
+    }
+
+    loadVolunteers();
+  </script>
+
+</body>
+</html>

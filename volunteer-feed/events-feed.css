@@ -1,0 +1,167 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Segoe UI", sans-serif;
+}
+
+body{
+  background: linear-gradient(135deg,#FF9800,#F57C00);
+  min-height:100vh;
+  padding:25px;
+}
+
+.wrap{
+  max-width:1100px;
+  margin:auto;
+  background: rgba(255,255,255,0.14);
+  backdrop-filter: blur(20px);
+  border-radius:18px;
+  padding:25px;
+  color:white;
+  box-shadow:0 10px 35px rgba(0,0,0,0.25);
+}
+
+.top h1{
+  font-size:30px;
+}
+
+.top p{
+  margin-top:6px;
+  opacity:0.9;
+}
+
+.back{
+  display:inline-block;
+  margin-top:12px;
+  color:white;
+  font-weight:800;
+  text-decoration:none;
+}
+
+.filters{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns: 1.4fr 1fr 1fr 0.5fr;
+  gap:10px;
+}
+
+.filters input, .filters select{
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  outline:none;
+}
+
+.filters button{
+  border:none;
+  border-radius:12px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:20px;
+  margin-bottom:15px;
+}
+
+#showSavedBtn{
+  background:#1b1b1b;
+  color:white;
+  padding:10px 14px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:900;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:14px;
+}
+
+.card{
+  background:white;
+  color:#222;
+  padding:16px;
+  border-radius:16px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.15);
+}
+
+.card h3{
+  font-size:18px;
+  margin-bottom:8px;
+}
+
+.tags{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+
+.tag{
+  background:#fff1e3;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  border:1px solid rgba(255,152,0,0.35);
+}
+
+.meta{
+  font-size:13px;
+  margin-top:6px;
+  opacity:0.9;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+
+.actions button{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:900;
+}
+
+.apply{
+  background:#FF9800;
+  color:white;
+}
+
+.save{
+  background:#1b1b1b;
+  color:white;
+}
+
+.empty{
+  margin-top:20px;
+  text-align:center;
+  display:none;
+  font-weight:800;
+}
+
+@media(max-width:900px){
+  .grid{
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media(max-width:600px){
+  .filters{
+    grid-template-columns:1fr;
+  }
+  .grid{
+    grid-template-columns: 1fr;
+  }
+}

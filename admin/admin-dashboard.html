@@ -18,13 +18,14 @@ body{
 }
 .sidebar{
     width:260px;
-    background:rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.12);
     backdrop-filter:blur(15px);
     padding:25px;
     color:white;
 }
 .sidebar h2{
     margin-bottom:30px;
+    font-size:22px;
 }
 .sidebar a{
     display:block;
@@ -32,72 +33,166 @@ body{
     text-decoration:none;
     padding:10px 0;
     transition:0.3s;
+    font-size:16px;
+    opacity:0.95;
 }
 .sidebar a:hover{
     transform:translateX(5px);
+    opacity:1;
+    text-decoration:underline;
 }
 .main{
     flex:1;
     padding:40px;
     background:#f5f5f5;
 }
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+    gap:20px;
+}
+.profileBox{
+    background:white;
+    padding:18px 22px;
+    border-radius:12px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.08);
+    margin-bottom:20px;
+}
+.profileBox h2{
+    margin:0;
+    font-size:20px;
+}
+.profileBox p{
+    margin:6px 0 0;
+    color:#444;
+}
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:18px;
+    margin-top:20px;
+}
 .card{
     background:white;
     padding:20px;
     border-radius:12px;
     box-shadow:0 5px 20px rgba(0,0,0,0.1);
-    margin-bottom:20px;
 }
-.topbar{
+.card h3{
+    margin:0;
+    font-size:16px;
+    color:#555;
+}
+.card h2{
+    margin:12px 0 0;
+    font-size:34px;
+    color:#2E7D32;
+}
+.actionButtons{
+    margin-top:25px;
     display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:30px;
+    gap:15px;
+    flex-wrap:wrap;
 }
-.logout{
+.btn{
+    border:none;
+    padding:12px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:15px;
+}
+.btnPrimary{
     background:#2E7D32;
     color:white;
-    border:none;
-    padding:8px 15px;
-    border-radius:6px;
-    cursor:pointer;
+}
+.btnSecondary{
+    background:#fff;
+    color:#2E7D32;
+    border:2px solid #2E7D32;
+}
+.btn:hover{
+    opacity:0.9;
 }
 </style>
 </head>
+
 <body>
 
 <div class="dashboard">
+
     <div class="sidebar">
         <h2>🌍 SevaSphere</h2>
-        <a href="#">Dashboard</a>
+
+        <a href="admin-dashboard.html">Dashboard</a>
         <a href="create-event.html">Create Event</a>
         <a href="view-volunteers.html">View Volunteers</a>
         <a href="attendance.html">Attendance</a>
+
+        <br>
         <a href="#" id="logoutBtn">Logout</a>
     </div>
 
     <div class="main">
+
         <div class="topbar">
-            <h1>Admin Dashboard</h1>
-            <div id="adminName">Loading...</div>
+            <h1 style="margin:0;">Admin Dashboard</h1>
         </div>
 
-        <div class="card">
-            <h3>Total Events</h3>
-            <h2 id="totalEvents">0</h2>
+        <div class="profileBox">
+            <h2 id="adminName">Loading...</h2>
+            <p>Manage events, track volunteers, and monitor participation in SevaSphere 💚</p>
         </div>
 
-        <div class="card">
-            <h3>Total Volunteers</h3>
-            <h2 id="totalVolunteers">0</h2>
+        <div class="cards">
+            <div class="card">
+                <h3>Total Events</h3>
+                <h2 id="totalEvents">0</h2>
+            </div>
+
+            <div class="card">
+                <h3>Upcoming Events</h3>
+                <h2 id="upcomingEvents">0</h2>
+            </div>
+
+            <div class="card">
+                <h3>Total Volunteers</h3>
+                <h2 id="totalVolunteers">0</h2>
+            </div>
+
+            <div class="card">
+                <h3>Total Applications</h3>
+                <h2 id="totalApplications">0</h2>
+            </div>
         </div>
+
+        <div class="actionButtons">
+            <button class="btn btnPrimary" onclick="window.location.href='create-event.html'">
+                + Create New Event
+            </button>
+
+            <button class="btn btnSecondary" onclick="window.location.href='view-volunteers.html'">
+                View Applications
+            </button>
+
+            <button class="btn btnSecondary" onclick="window.location.href='attendance.html'">
+                Mark Attendance
+            </button>
+        </div>
+
     </div>
+
 </div>
+
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { 
+    getFirestore, collection, getDocs, doc, getDoc 
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-z1Zx-0qAj6_FGiclcXFdIjiKSjXlUKw",
@@ -112,34 +207,72 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Helper: check upcoming
+function isUpcoming(dateStr){
+    if(!dateStr) return false;
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const eventDate = new Date(dateStr);
+    eventDate.setHours(0,0,0,0);
+
+    return eventDate >= today;
+}
+
 onAuthStateChanged(auth, async (user)=>{
+
     if(!user){
         window.location.href="admin-login.html";
         return;
     }
 
+    // Check admin role
     const userDoc = await getDoc(doc(db,"users",user.uid));
 
-    if(!userDoc.exists() || userDoc.data().role!=="admin"){
+    if(!userDoc.exists() || userDoc.data().role !== "admin"){
         window.location.href="../index.html";
         return;
     }
 
-    document.getElementById("adminName").innerText=userDoc.data().name;
+    // Show admin name
+    document.getElementById("adminName").innerText = "Welcome, " + userDoc.data().name + " 👋";
 
-    const events = await getDocs(collection(db,"events"));
-    document.getElementById("totalEvents").innerText=events.size;
+    // Total Events + Upcoming Events
+    const eventsSnap = await getDocs(collection(db,"events"));
+    document.getElementById("totalEvents").innerText = eventsSnap.size;
 
-    const volunteers = await getDocs(collection(db,"users"));
-    let count=0;
-    volunteers.forEach(v=>{
-        if(v.data().role==="volunteer") count++;
+    let upcomingCount = 0;
+    eventsSnap.forEach((docItem)=>{
+        const ev = docItem.data();
+        if(isUpcoming(ev.date)) upcomingCount++;
     });
-    document.getElementById("totalVolunteers").innerText=count;
+    document.getElementById("upcomingEvents").innerText = upcomingCount;
+
+    // Total Volunteers
+    const usersSnap = await getDocs(collection(db,"users"));
+    let volunteerCount = 0;
+
+    usersSnap.forEach((u)=>{
+        if(u.data().role === "volunteer") volunteerCount++;
+    });
+
+    document.getElementById("totalVolunteers").innerText = volunteerCount;
+
+    // Total Applications (optional)
+    // If you haven't created applications collection yet, it will show 0
+    try{
+        const appsSnap = await getDocs(collection(db, "applications"));
+        document.getElementById("totalApplications").innerText = appsSnap.size;
+    }catch(err){
+        document.getElementById("totalApplications").innerText = 0;
+        console.log("Applications collection not found yet:", err.message);
+    }
 });
 
-document.getElementById("logoutBtn").addEventListener("click",()=>{
-    signOut(auth);
+document.getElementById("logoutBtn").addEventListener("click", async (e)=>{
+    e.preventDefault();
+    await signOut(auth);
     window.location.href="../index.html";
 });
 </script>

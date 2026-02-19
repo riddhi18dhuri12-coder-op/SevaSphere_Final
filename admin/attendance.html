@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Attendance | SevaSphere</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <h2 style="text-align:center;">NGO - Attendance Prototype</h2>
+
+  <p style="text-align:center;">
+    (Prototype) Attendance can be marked here after event day.
+  </p>
+
+  <div style="width:80%; margin:auto;" id="attendanceBox"></div>
+
+  <script src="../assets/js/data.js"></script>
+
+  <script>
+    const box = document.getElementById("attendanceBox");
+
+    function loadAttendance() {
+      let events = JSON.parse(localStorage.getItem("events")) || [];
+      let applications = JSON.parse(localStorage.getItem("applications")) || [];
+
+      box.innerHTML = "";
+
+      events.forEach(event => {
+        let eventApps = applications.filter(app => app.eventId === event.id);
+
+        let div = document.createElement("div");
+        div.style.border = "1px solid #ccc";
+        div.style.padding = "15px";
+        div.style.marginBottom = "15px";
+        div.style.borderRadius = "10px";
+
+        div.innerHTML = `
+          <h3>${event.title}</h3>
+          <p>Applications: ${eventApps.length}</p>
+          <p>(Attendance feature can be upgraded later with volunteer names)</p>
+        `;
+
+        box.appendChild(div);
+      });
+    }
+
+    loadAttendance();
+  </script>
+
+</body>
+</html>

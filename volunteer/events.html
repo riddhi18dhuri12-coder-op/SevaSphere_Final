@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Volunteer Events | SevaSphere</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <h2 style="text-align:center;">Volunteer Event Feed</h2>
+
+  <div style="text-align:center; margin: 20px;">
+    <label>Filter by Category: </label>
+    <select id="categoryFilter">
+      <option value="All">All</option>
+      <option value="Tree Plantation">Tree Plantation</option>
+      <option value="Cleanliness">Cleanliness</option>
+      <option value="Teaching">Teaching</option>
+      <option value="Donation Drive">Donation Drive</option>
+    </select>
+  </div>
+
+  <div id="eventsContainer" style="width:80%; margin:auto;"></div>
+
+  <script src="../assets/js/data.js"></script>
+
+  <script>
+    const eventsContainer = document.getElementById("eventsContainer");
+    const categoryFilter = document.getElementById("categoryFilter");
+
+    function loadEvents() {
+      let events = JSON.parse(localStorage.getItem("events")) || [];
+      let applications = JSON.parse(localStorage.getItem("applications")) || [];
+
+      let selectedCategory = categoryFilter.value;
+
+      let filteredEvents = events.filter(e => {
+        return selectedCategory === "All" || e.category === selectedCategory;
+      });
+
+      eventsContainer.innerHTML = "";
+
+      filteredEvents.forEach(event => {
+        let alreadyApplied = applications.some(app => app.eventId === event.id);
+
+        let card = document.createElement("div");
+        card.style.border = "1px solid #ccc";
+        card.style.padding = "15px";
+        card.style.marginBottom = "15px";
+        card.style.borderRadius = "10px";
+
+        card.innerHTML = `
+          <h3>${event.title}</h3>
+          <p><b>Category:</b> ${event.category}</p>
+          <p><b>Location:</b> ${event.location}</p>
+          <p><b>Date:</b> ${event.date} | <b>Time:</b> ${event.time}</p>
+          <p><b>NGO:</b> ${event.ngo}</p>
+          <p>${event.description}</p>
+
+          <button ${alreadyApplied ? "disabled" : ""} onclick="applyEvent(${event.id})">
+            ${alreadyApplied ? "Applied" : "Apply"}
+          </button>
+        `;
+
+        eventsContainer.appendChild(card);
+      });
+    }
+
+    function applyEvent(eventId) {
+      let applications = JSON.parse(localStorage.getItem("applications")) || [];
+
+      applications.push({
+        eventId: eventId,
+        status: "Pending",
+        appliedAt: new Date().toLocaleString()
+      });
+
+      localStorage.setItem("applications", JSON.stringify(applications));
+      alert("Applied successfully!");
+      loadEvents();
+    }
+
+    categoryFilter.addEventListener("change", loadEvents);
+
+    loadEvents();
+  </script>
+
+</body>
+</html>
