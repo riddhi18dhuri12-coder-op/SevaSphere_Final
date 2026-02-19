@@ -121,26 +121,29 @@ loginForm.addEventListener("submit", async (e) => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  try {
-    const userCred = await signInWithEmailAndPassword(auth, email, password);
-    const userDoc = await getDoc(doc(db, "users", userCred.user.uid));
+try {
+  const userCred = await signInWithEmailAndPassword(auth, email, password);
+  const userDoc = await getDoc(doc(db, "users", userCred.user.uid));
 
-    if (!userDoc.exists()) {
-      alert("User data not found in Firestore!");
-      return;
-    }
-
-    if (userDoc.data().role !== "admin") {
-      alert("You are not registered as an Admin!");
-      return;
-    }
-
-    alert("Login successful!");
-    window.location.href = "admin-dashboard.html";
-
-  } catch (error) {
-    alert(error.message);
+  if (!userDoc.exists()) {
+    errorBox.innerText = "User data not found in Firestore!";
+    return;
   }
+
+  if (userDoc.data().role !== "admin") {
+    errorBox.innerText = "You are not registered as an Admin!";
+    return;
+  }
+
+  successBox.innerText = "Login successful! Redirecting...";
+  setTimeout(() => {
+    window.location.href = "admin-dashboard.html";
+  }, 700);
+
+} catch (error) {
+  errorBox.innerText = error.message;
+}
+
 });
 </script>
 
