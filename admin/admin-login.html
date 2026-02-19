@@ -1,68 +1,113 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Admin Login - SevaSphere</title>
 <meta charset="UTF-8">
+<title>Admin Login - SevaSphere</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+/* --- Body --- */
 body{
     margin:0;
     font-family:'Segoe UI',sans-serif;
-    background: linear-gradient(135deg, #0B132B, #1F254F);
+    background: linear-gradient(135deg, #168AAD, #52B69A); /* teal + blue gradient */
     display:flex;
     justify-content:center;
     align-items:center;
     height:100vh;
 }
+
+/* --- Card --- */
 .card{
-    background:#F8FAFF;
+    background: #F8FAFF; /* clean white card */
     padding:40px 35px;
+    border-radius:16px;
     width:360px;
-    border-radius:15px;
-    box-shadow:0 15px 35px rgba(0,0,0,0.3);
+    box-shadow:0 15px 40px rgba(0,0,0,0.25);
+    color:#168AAD; /* primary teal text */
     text-align:center;
 }
+
+/* --- Heading --- */
+.card h2{
+    margin-bottom:25px;
+    color:#184E77; /* deep blue heading */
+}
+
+/* --- Input Fields --- */
 input{
     width:100%;
     padding:12px;
-    margin:10px 0;
-    border-radius:8px;
-    border:1px solid #ddd;
+    margin-bottom:15px;
+    border:1px solid #dbe7ef;
+    border-radius:10px;
+    outline:none;
+    font-size:14px;
 }
+
+/* --- Button --- */
 button{
     width:100%;
     padding:12px;
     border:none;
-    border-radius:8px;
-    background:#00BFA6;
+    border-radius:10px;
+    background:#168AAD; /* primary teal button */
     color:white;
     font-weight:bold;
+    font-size:15px;
     cursor:pointer;
+    transition:0.3s;
 }
-button:hover{background:#009d87;}
-.error{color:red;font-size:13px;}
-.success{color:green;font-size:13px;}
+button:hover{
+    background:#0f5d73; /* darker teal on hover */
+}
+
+/* --- Links --- */
+.link{
+    margin-top:15px;
+    font-size:14px;
+}
+.link a{
+    color:#168AAD;
+    font-weight:600;
+    text-decoration:none;
+}
+.link a:hover{
+    text-decoration:underline;
+}
+
+/* --- Messages --- */
+.error{
+    color:#e74c3c;
+    text-align:center;
+    margin-bottom:10px;
+    font-size:13px;
+}
+.success{
+    color:#27ae60;
+    text-align:center;
+    margin-bottom:10px;
+    font-size:13px;
+}
 </style>
 </head>
 
 <body>
-
 <div class="card">
-<h2>Admin Login</h2>
+<h2>👤 Admin Login</h2>
 
 <div id="error" class="error"></div>
 <div id="success" class="success"></div>
 
 <form id="loginForm">
-<input type="email" id="email" placeholder="Email" required>
-<input type="password" id="password" placeholder="Password" required>
-<button type="submit">Login</button>
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="password" id="password" placeholder="Password" required>
+  <button type="submit">Login</button>
 </form>
 
-<p>New here?
-<a href="admin-signup.html" style="color:#00BFA6;">Signup</a>
-</p>
+<div class="link">
+  <p>Don't have an account? <a href="admin-signup.html">Sign Up</a></p>
+</div>
 </div>
 
 <script type="module">
@@ -83,41 +128,41 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const form = document.getElementById("loginForm");
+const loginForm = document.getElementById("loginForm");
 const errorBox = document.getElementById("error");
 const successBox = document.getElementById("success");
 
-form.addEventListener("submit", async (e)=>{
-    e.preventDefault();
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    errorBox.innerText="";
-    successBox.innerText="";
+  errorBox.innerText = "";
+  successBox.innerText = "";
 
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-    try{
-        const userCred = await signInWithEmailAndPassword(auth,email,password);
-        const userDoc = await getDoc(doc(db,"users",userCred.user.uid));
+  try {
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+    const userDoc = await getDoc(doc(db, "users", userCred.user.uid));
 
-        if(!userDoc.exists()){
-            errorBox.innerText="User data not found!";
-            return;
-        }
-
-        if(userDoc.data().role !== "admin"){
-            errorBox.innerText="You are not registered as Admin!";
-            return;
-        }
-
-        successBox.innerText="Login successful! Redirecting...";
-        setTimeout(()=>{
-            window.location.href="admin-dashboard.html";
-        },700);
-
-    }catch(error){
-        errorBox.innerText=error.message;
+    if (!userDoc.exists()) {
+      errorBox.innerText = "User data not found in Firestore!";
+      return;
     }
+
+    if (userDoc.data().role !== "admin") {
+      errorBox.innerText = "You are not registered as a Admin!";
+      return;
+    }
+
+    successBox.innerText = "Login successful! Redirecting...";
+    setTimeout(() => {
+      window.location.href = "admin-dashboard.html";
+    }, 700);
+
+  } catch (error) {
+    errorBox.innerText = error.message;
+  }
 });
 </script>
 
