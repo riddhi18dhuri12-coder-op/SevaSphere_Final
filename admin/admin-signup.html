@@ -2,6 +2,8 @@
 <html>
 <head>
 <title>Admin Signup - SevaSphere</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
@@ -39,15 +41,12 @@ button{
     color:white;
     font-weight:bold;
     cursor:pointer;
-    transition:0.3s;
 }
 button:hover{
     background:#0072ff;
 }
-a{
-    color:#00c6ff;
-    text-decoration:none;
-}
+.error{color:#ff4d4d;font-size:13px;}
+.success{color:#00ff99;font-size:13px;}
 </style>
 </head>
 
@@ -56,6 +55,9 @@ a{
 <div class="card">
 <h2>Admin Signup</h2>
 
+<div id="error" class="error"></div>
+<div id="success" class="success"></div>
+
 <form id="signupForm">
 <input type="text" id="name" placeholder="Full Name" required>
 <input type="email" id="email" placeholder="Email" required>
@@ -63,8 +65,8 @@ a{
 <button type="submit">Create Account</button>
 </form>
 
-<p>Already have account? 
-<a href="admin-login.html">Login</a>
+<p>Already have account?
+<a href="admin-login.html" style="color:#00c6ff;">Login</a>
 </p>
 </div>
 
@@ -86,35 +88,38 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const signupForm = document.getElementById("signupForm");
+const form = document.getElementById("signupForm");
+const errorBox = document.getElementById("error");
+const successBox = document.getElementById("success");
 
-signupForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+form.addEventListener("submit", async (e)=>{
+    e.preventDefault();
 
-  const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+    errorBox.innerText = "";
+    successBox.innerText = "";
 
-  try {
-    // Create user in Firebase Auth
-    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
-    // Store user data in Firestore
-    await setDoc(doc(db, "users", userCred.user.uid), {
-      name: name,
-      email: email,
-      role: "admin",
-      createdAt: new Date()
-    });
+    try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
 
-    alert("Signup successful! Redirecting...");
-    setTimeout(() => {
-      window.location.href = "admin-dashboard.html";
-    }, 700);
+        await setDoc(doc(db, "users", userCred.user.uid), {
+            name: name,
+            email: email,
+            role: "admin",
+            createdAt: new Date()
+        });
 
-  } catch (error) {
-    alert(error.message);
-  }
+        successBox.innerText = "Signup successful! Redirecting...";
+        setTimeout(()=>{
+            window.location.href = "admin-dashboard.html";
+        },700);
+
+    } catch(error){
+        errorBox.innerText = error.message;
+    }
 });
 </script>
 
