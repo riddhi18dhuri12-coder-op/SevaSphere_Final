@@ -62,24 +62,31 @@ a{
 <a href="volunteer-signup.html">Signup</a>
 </p>
 </div>
-
 <script type="module">
 import { login } from "../js/auth.js";
 
-const base = "/SevaSphere";
+const base = "/SevaSphere_Final";
 
 document.getElementById("loginForm").addEventListener("submit", async (e)=>{
-e.preventDefault();
+    e.preventDefault();
 
-const result = await login(email.value,password.value);
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-if(result.success){
-window.location.href = base + "/volunteer/volunteer-dashboard.html";
-}else{
-alert(result.error);
-}
+    const result = await login(email, password);
+
+    if(result.success){
+
+        if(result.user.role === "admin"){
+            window.location.href = base + "/admin/admin-dashboard.html";
+        } else {
+            window.location.href = base + "/volunteer/volunteer-dashboard.html";
+        }
+
+    }else{
+        alert(result.error);
+    }
 });
 </script>
 
-</body>
 </html>
