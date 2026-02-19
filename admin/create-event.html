@@ -78,7 +78,8 @@
     <input id="time" placeholder="Time (08:00 AM)"><br>
     <input id="ngo" placeholder="NGO Name"><br>
     <textarea id="description" placeholder="Event Description"></textarea><br>
-    <button onclick="createEvent()">Create Event</button>
+   <button id="createBtn">Create Event</button>
+
   </div>
 
 
@@ -99,31 +100,33 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-document.getElementById("createEventForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const user = auth.currentUser;
-  if (!user) {
-    alert("Login first");
-    return;
-  }
+document.getElementById("createBtn").addEventListener("click", async () => {
 
   const title = document.getElementById("title").value;
-  const description = document.getElementById("description").value;
-  const date = document.getElementById("date").value;
+  const category = document.getElementById("category").value;
   const location = document.getElementById("location").value;
+  const date = document.getElementById("date").value;
+  const time = document.getElementById("time").value;
+  const ngo = document.getElementById("ngo").value;
+  const description = document.getElementById("description").value;
 
   const eventsRef = ref(db, "events");
   const newEventRef = push(eventsRef);
 
   await set(newEventRef, {
     title,
-    description,
-    date,
+    category,
     location,
-    createdBy: user.uid,
+    date,
+    time,
+    ngo,
+    description,
     createdAt: Date.now()
   });
+
+  alert("Event Created Successfully 🎉");
+});
+
 
   alert("Event Created Successfully 🎉");
   window.location.href = "admin-dashboard.html";
