@@ -100,8 +100,15 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
+const signupForm = document.getElementById("signupForm");
+const errorBox = document.getElementById("error");
+const successBox = document.getElementById("success");
+
 signupForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  errorBox.innerText = "";
+  successBox.innerText = "";
 
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
@@ -111,20 +118,25 @@ signupForm.addEventListener("submit", async (e) => {
 
     const userCred = await createUserWithEmailAndPassword(auth, email, password);
 
+    // ✅ STORE AS ADMIN IN REALTIME DATABASE
     await set(ref(db, "users/" + userCred.user.uid), {
-      name,
-      email,
-      role: "admin",
+      name: name,
+      email: email,
+      role: "admin",   // 🔥 changed here
       createdAt: Date.now()
     });
 
-    successBox.innerText = "Account created successfully!";
-    setTimeout(()=> window.location.href="admin-dashboard.html",1000);
+    successBox.innerText = "Admin account created successfully! Redirecting...";
+
+    setTimeout(() => {
+      window.location.href = "admin-dashboard.html";   // 🔥 changed here
+    }, 1000);
 
   } catch (error) {
     errorBox.innerText = error.message;
   }
 });
+</script>;
 </script>
     
 
