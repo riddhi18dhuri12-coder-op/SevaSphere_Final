@@ -218,11 +218,12 @@ body{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-z1Zx-0qAj6_FGiclcXFdIjiKSjXlUKw",
   authDomain: "sevasphere-6dce7.firebaseapp.com",
+  databaseURL: "https://sevasphere-6dce7-default-rtdb.asia-southeast1.firebasedatabase.app/",
   projectId: "sevasphere-6dce7",
   storageBucket: "sevasphere-6dce7.appspot.com",
   messagingSenderId: "930986469572",
@@ -231,10 +232,9 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const db = getDatabase(app);
 
 function isUpcoming(dateStr){
-    if(!dateStr) return false;
     const today = new Date();
     today.setHours(0,0,0,0);
     const eventDate = new Date(dateStr);
@@ -243,42 +243,53 @@ function isUpcoming(dateStr){
 }
 
 onAuthStateChanged(auth, async (user)=>{
+
     if(!user){ window.location.href="admin-login.html"; return; }
 
-    const userDoc = await getDoc(doc(db,"users",user.uid));
-    if(!userDoc.exists() || userDoc.data().role !== "admin"){
+    const userSnap = await get(ref(db,"users/"+user.uid));
+    if(!userSnap.exists() || userSnap.val().role !== "admin"){
         window.location.href="../index.html";
         return;
     }
 
-    document.getElementById("adminName").innerText = "Welcome, " + userDoc.data().name + " 👋";
+    document.getElementById("adminName").innerText =
+        "Welcome, " + userSnap.val().name + " 👋";
 
-    const eventsSnap = await getDocs(collection(db,"events"));
-    document.getElementById("totalEvents").innerText = eventsSnap.size;
+    // Events
+    const eventsSnap = await get(ref(db,"events"));
+    let totalEvents=0, upcoming=0;
 
-    let upcomingCount = 0;
-    eventsSnap.forEach((docItem)=>{
-        if(isUpcoming(docItem.data().date)) upcomingCount++;
-    });
-    document.getElementById("upcomingEvents").innerText = upcomingCount;
-
-    const usersSnap = await getDocs(collection(db,"users"));
-    let volunteerCount = 0;
-    usersSnap.forEach((u)=>{
-        if(u.data().role === "volunteer") volunteerCount++;
-    });
-    document.getElementById("totalVolunteers").innerText = volunteerCount;
-
-    try{
-        const appsSnap = await getDocs(collection(db, "applications"));
-        document.getElementById("totalApplications").innerText = appsSnap.size;
-    }catch(err){
-        document.getElementById("totalApplications").innerText = 0;
-        console.log("Applications collection not found yet:", err.message);
+    if(eventsSnap.exists()){
+        const events = eventsSnap.val();
+        totalEvents = Object.keys(events).length;
+        Object.values(events).forEach(ev=>{
+            if(isUpcoming(ev.date)) upcoming++;
+        });
     }
+
+    document.getElementById("totalEvents").innerText=totalEvents;
+    document.getElementById("upcomingEvents").innerText=upcoming;
+
+    // Users
+    const usersSnap = await get(ref(db,"users"));
+    let volunteerCount=0;
+
+    if(usersSnap.exists()){
+        Object.values(usersSnap.val()).forEach(u=>{
+            if(u.role==="volunteer") volunteerCount++;
+        });
+    }
+
+    document.getElementById("totalVolunteers").innerText=volunteerCount;
+
+    // Applications
+    const appsSnap = await get(ref(db,"applications"));
+    document.getElementById("totalApplications").innerText =
+        appsSnap.exists()? Object.keys(appsSnap.val()).length : 0;
 });
 
-document.getElementById("logoutBtn").addEventListener("click", async (e)=>{
+// Logout
+logoutBtn.addEventListener("click", async(e)=>{
     e.preventDefault();
     await signOut(auth);
     window.location.href="../index.html";
