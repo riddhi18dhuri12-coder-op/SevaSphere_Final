@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Chats</title>
+  <style>
+    body { font-family:Segoe UI; background:#f4f7fb; display:flex; height:100vh; }
+    .sidebar { width:300px; background:#168AAD; color:white; padding:20px; overflow-y:auto; }
+    .chatList div { padding:10px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.2); }
+    .chatList div:hover { background:#0f5d73; }
+    .chatBox { flex:1; display:flex; flex-direction:column; }
+    .messages { flex:1; padding:20px; overflow-y:auto; }
+    .inputBox { display:flex; padding:10px; background:white; }
+    .inputBox input { flex:1; padding:10px; }
+    .inputBox button { padding:10px; }
+    .msg { margin-bottom:10px; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h3>My Event Chats</h3>
+  <div class="chatList" id="chatList"></div>
+</div>
+
+<div class="chatBox">
+  <div class="messages" id="messages"></div>
+  <div class="inputBox">
+    <input id="messageInput" placeholder="Type message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getDatabase, ref, onValue, push, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA-z1Zx-0qAj6_FGiclcXFdIjiKSjXlUKw",
+  authDomain: "sevasphere-6dce7.firebaseapp.com",
+  databaseURL: "https://sevasphere-6dce7-default-rtdb.asia-southeast1.firebasedatabase.app/",
+  projectId: "sevasphere-6dce7",
+  storageBucket: "sevasphere-6dce7.appspot.com",
+  messagingSenderId: "930986469572",
+  appId: "1:930986469572:web:7c62c3e6ff7c3f90d98191"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let currentUser = null;
+let currentChatId = null;
+
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){ window.location.href="admin-login.html"; return; }
+  currentUser = user;
+  loadChats();
+});
+
+function loadChats(){
+  const chatsRef = ref(db,"chats");
+
+  onValue(chatsRef,(snap)=>{
+    const chatList = document.getElementById("chatList");
+    chatList.innerHTML="";
+    const chats = snap.val() || {};
+
+    Object.entries(chats).forEach(([chatId,chat])=>{
+      if(chat.adminId === currentUser.uid){
+        const div = document.createElement("div");
+        div.innerText = chat.groupName;
+        div.onclick = ()=> openChat(chatId);
+        chatList.appendChild(div);
+      }
+    });
+  });
+}
+
+function openChat(chatId){
+  currentChatId = chatId;
+  const messagesRef = ref(db,"chats/"+chatId+"/messages");
+
+  onValue(messagesRef,(snap)=>{
+    const messagesDiv = document.getElementById("messages");
+    messagesDiv.innerHTML="";
+    const msgs = snap.val() || {};
+
+    Object.values(msgs).forEach(msg=>{
+      const div = document.createElement("div");
+      div.className="msg";
+      div.innerHTML="<b>"+msg.senderName+":</b> "+msg.text;
+      messagesDiv.appendChild(div);
+    });
+
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  });
+}
+
+window.sendMessage = async function(){
+  const text = document.getElementById("messageInput").value;
+  if(!text || !currentChatId) return;
+
+  const userSnap = await get(ref(db,"users/"+currentUser.uid));
+  const name = userSnap.val().name;
+
+  await push(ref(db,"chats/"+currentChatId+"/messages"),{
+    senderId: currentUser.uid,
+    senderName: name,
+    text: text,
+    timestamp: Date.now()
+  });
+
+  document.getElementById("messageInput").value="";
+};
+</script>
+
+</body>
+</html>
