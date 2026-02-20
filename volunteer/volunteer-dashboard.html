@@ -180,13 +180,12 @@ body{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { 
-    getFirestore, collection, getDocs, doc, getDoc, query, where 
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-z1Zx-0qAj6_FGiclcXFdIjiKSjXlUKw",
   authDomain: "sevasphere-6dce7.firebaseapp.com",
+  databaseURL: "https://sevasphere-6dce7-default-rtdb.asia-southeast1.firebasedatabase.app/",
   projectId: "sevasphere-6dce7",
   storageBucket: "sevasphere-6dce7.appspot.com",
   messagingSenderId: "930986469572",
@@ -195,10 +194,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const db = getDatabase(app);
 
 function isUpcoming(dateStr){
     if(!dateStr) return false;
+
     const today = new Date();
     today.setHours(0,0,0,0);
 
@@ -215,39 +215,55 @@ onAuthStateChanged(auth, async (user)=>{
         return;
     }
 
-    const userDoc = await getDoc(doc(db,"users",user.uid));
+    // 🔥 Get user data from Realtime Database
+    const userSnap = await get(ref(db,"users/"+user.uid));
 
-    if(!userDoc.exists() || userDoc.data().role !== "volunteer"){
+    if(!userSnap.exists() || userSnap.val().role !== "volunteer"){
         window.location.href="../index.html";
         return;
     }
 
-    document.getElementById("volunteerName").innerText = "Hi, " + userDoc.data().name + " 👋";
+    const userData = userSnap.val();
 
-    const eventsSnapshot = await getDocs(collection(db,"events"));
-    document.getElementById("totalEvents").innerText = eventsSnapshot.size;
+    document.getElementById("volunteerName").innerText =
+        "Hi, " + userData.name + " 👋";
 
+    // 🔥 Get all events
+    const eventsSnap = await get(ref(db,"events"));
+    let totalEvents = 0;
     let upcomingCount = 0;
-    eventsSnapshot.forEach((docItem)=>{
-        const ev = docItem.data();
-        if(isUpcoming(ev.date)) upcomingCount++;
-    });
+
+    if(eventsSnap.exists()){
+        const events = eventsSnap.val();
+        totalEvents = Object.keys(events).length;
+
+        Object.values(events).forEach(ev=>{
+            if(isUpcoming(ev.date)) upcomingCount++;
+        });
+    }
+
+    document.getElementById("totalEvents").innerText = totalEvents;
     document.getElementById("upcomingEvents").innerText = upcomingCount;
 
-    try{
-        const appsQuery = query(
-            collection(db, "applications"),
-            where("volunteerId", "==", user.uid)
-        );
+    // 🔥 Get applications of this volunteer
+    const appsSnap = await get(ref(db,"applications"));
+    let myAppsCount = 0;
 
-        const appsSnap = await getDocs(appsQuery);
-        document.getElementById("myApplications").innerText = appsSnap.size;
-    }catch(err){
-        document.getElementById("myApplications").innerText = 0;
-        console.log("Applications not found yet:", err.message);
+    if(appsSnap.exists()){
+        const applications = appsSnap.val();
+
+        Object.values(applications).forEach(app=>{
+            if(app.volunteerId === user.uid){
+                myAppsCount++;
+            }
+        });
     }
+
+    document.getElementById("myApplications").innerText = myAppsCount;
+
 });
 
+// Logout
 document.getElementById("logoutBtn").addEventListener("click", async (e)=>{
     e.preventDefault();
     await signOut(auth);
