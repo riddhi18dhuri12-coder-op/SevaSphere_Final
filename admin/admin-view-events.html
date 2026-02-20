@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All Events | SevaSphere Admin</title>
+
+  <style>
+    body {
+      background: #f4f7fb;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
+      margin:0;
+    }
+
+    .top-bar {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    }
+
+    h2 { color:#1e6091; margin:0; }
+
+    .my-events-btn {
+      background:#168AAD;
+      color:white;
+      border:none;
+      padding:10px 18px;
+      border-radius:10px;
+      cursor:pointer;
+    }
+
+    .filters {
+      display:flex;
+      gap:15px;
+      margin-bottom:30px;
+      flex-wrap:wrap;
+    }
+
+    input, select {
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #ccc;
+      flex:1;
+    }
+
+    .clear-btn {
+      background:#1e6091;
+      color:white;
+      border:none;
+      border-radius:10px;
+      padding:12px 18px;
+      cursor:pointer;
+    }
+
+    .event-card {
+      background:#fff;
+      border-radius:20px;
+      padding:25px;
+      margin-bottom:25px;
+      box-shadow:0 8px 25px rgba(0,0,0,0.08);
+    }
+
+    .event-title {
+      font-size:22px;
+      font-weight:700;
+      margin-bottom:15px;
+      color:#184E77;
+    }
+
+    .badge {
+      display:inline-block;
+      padding:8px 16px;
+      border-radius:25px;
+      font-size:14px;
+      font-weight:600;
+      margin-right:10px;
+      margin-bottom:15px;
+    }
+
+    .badge-category { background:#e0f2fe; color:#0369a1; }
+    .badge-city { background:#dcfce7; color:#15803d; }
+
+    .info-btn {
+      background:#94a3b8;
+      color:white;
+      border:none;
+      padding:10px 18px;
+      border-radius:12px;
+      cursor:pointer;
+    }
+
+    .modal {
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.5);
+      justify-content:center;
+      align-items:center;
+    }
+
+    .modal-content {
+      background:white;
+      padding:30px;
+      border-radius:20px;
+      width:400px;
+      max-width:90%;
+    }
+
+    .close-btn {
+      float:right;
+      cursor:pointer;
+      font-weight:bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="top-bar">
+  <h2>📂 Admin Events</h2>
+  <button id="myEventsBtn" class="my-events-btn">👤 My Events</button>
+</div>
+
+<div class="filters">
+  <input id="searchInput" placeholder="Search event name...">
+  <select id="categoryFilter"><option value="All">All Categories</option></select>
+  <select id="cityFilter"><option value="All">All Cities</option></select>
+  <button class="clear-btn" id="clearBtn">Clear</button>
+</div>
+
+<div id="eventsContainer"></div>
+
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">✖</span>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getDatabase, ref, onValue } 
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA-z1Zx-0qAj6_FGiclcXFdIjiKSjXlUKw",
+  authDomain: "sevasphere-6dce7.firebaseapp.com",
+  databaseURL: "https://sevasphere-6dce7-default-rtdb.asia-southeast1.firebasedatabase.app/",
+  projectId: "sevasphere-6dce7",
+  storageBucket: "sevasphere-6dce7.appspot.com",
+  messagingSenderId: "930986469572",
+  appId: "1:930986469572:web:7c62c3e6ff7c3f90d98191"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const eventsContainer = document.getElementById("eventsContainer");
+const searchInput = document.getElementById("searchInput");
+const categoryFilter = document.getElementById("categoryFilter");
+const cityFilter = document.getElementById("cityFilter");
+const clearBtn = document.getElementById("clearBtn");
+const myEventsBtn = document.getElementById("myEventsBtn");
+
+let allEvents = {};
+let currentUser = null;
+let showMyEventsOnly = false;
+
+
+// AUTH
+onAuthStateChanged(auth, (user)=>{
+  if(!user){
+    window.location.href="admin-login.html";
+    return;
+  }
+  currentUser = user;
+  loadEvents();
+});
+
+
+// FETCH EVENTS
+function loadEvents(){
+  onValue(ref(db,"events"), snap=>{
+    allEvents = snap.val() || {};
+    populateFilters();
+    renderEvents();
+  });
+}
+
+
+// UNIQUE FILTERS
+function populateFilters(){
+  const categories = new Set();
+  const cities = new Set();
+
+  Object.values(allEvents).forEach(event=>{
+    if(event.category) categories.add(event.category);
+    if(event.location) cities.add(event.location);
+  });
+
+  categoryFilter.innerHTML='<option value="All">All Categories</option>';
+  cityFilter.innerHTML='<option value="All">All Cities</option>';
+
+  categories.forEach(cat=>{
+    categoryFilter.innerHTML+=`<option value="${cat}">${cat}</option>`;
+  });
+
+  cities.forEach(city=>{
+    cityFilter.innerHTML+=`<option value="${city}">${city}</option>`;
+  });
+}
+
+
+// RENDER
+function renderEvents(){
+
+  const searchText = searchInput.value.toLowerCase();
+  const selectedCategory = categoryFilter.value;
+  const selectedCity = cityFilter.value;
+
+  eventsContainer.innerHTML="";
+
+  Object.entries(allEvents).forEach(([eventId,event])=>{
+
+    if(showMyEventsOnly && event.createdBy !== currentUser.uid) return;
+
+    if(
+      (selectedCategory!=="All" && event.category!==selectedCategory) ||
+      (selectedCity!=="All" && event.location!==selectedCity) ||
+      (!event.title.toLowerCase().includes(searchText))
+    ) return;
+
+    const card=document.createElement("div");
+    card.className="event-card";
+
+    card.innerHTML=`
+      <div class="event-title">${event.title}</div>
+
+      <span class="badge badge-category">${event.category}</span>
+      <span class="badge badge-city">${event.location}</span>
+
+      <div><b>Date:</b> ${event.date}</div>
+      <div><b>NGO:</b> ${event.ngo}</div>
+
+      <br>
+      <button class="info-btn" onclick="showInfo('${eventId}')">
+        ℹ View Details
+      </button>
+    `;
+
+    eventsContainer.appendChild(card);
+  });
+}
+
+
+// INFO MODAL
+window.showInfo=function(eventId){
+  const event=allEvents[eventId];
+
+  document.getElementById("modalContent").innerHTML=`
+    <h3>${event.title}</h3>
+    <p><b>Category:</b> ${event.category}</p>
+    <p><b>Location:</b> ${event.location}</p>
+    <p><b>Date:</b> ${event.date}</p>
+    <p><b>Time:</b> ${event.time}</p>
+    <p><b>NGO:</b> ${event.ngo}</p>
+    <p>${event.description}</p>
+  `;
+
+  document.getElementById("infoModal").style.display="flex";
+};
+
+window.closeModal=function(){
+  document.getElementById("infoModal").style.display="none";
+};
+
+
+// TOGGLE MY EVENTS
+myEventsBtn.addEventListener("click",()=>{
+  showMyEventsOnly=!showMyEventsOnly;
+  myEventsBtn.innerText=showMyEventsOnly?"🔙 Show All Events":"👤 My Events";
+  renderEvents();
+});
+
+
+// FILTERS
+searchInput.addEventListener("input",renderEvents);
+categoryFilter.addEventListener("change",renderEvents);
+cityFilter.addEventListener("change",renderEvents);
+
+clearBtn.addEventListener("click",()=>{
+  searchInput.value="";
+  categoryFilter.value="All";
+  cityFilter.value="All";
+  renderEvents();
+});
+
+</script>
+
+</body>
+</html>
