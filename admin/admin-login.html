@@ -113,11 +113,12 @@ button:hover{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-z1Zx-0qAj6_FGiclcXFdIjiKSjXlUKw",
   authDomain: "sevasphere-6dce7.firebaseapp.com",
+  databaseURL: "https://sevasphere-6dce7-default-rtdb.asia-southeast1.firebasedatabase.app/",
   projectId: "sevasphere-6dce7",
   storageBucket: "sevasphere-6dce7.appspot.com",
   messagingSenderId: "930986469572",
@@ -126,45 +127,29 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
-
-const loginForm = document.getElementById("loginForm");
-const errorBox = document.getElementById("error");
-const successBox = document.getElementById("success");
+const db = getDatabase(app);
 
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  errorBox.innerText = "";
-  successBox.innerText = "";
-
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-
   try {
-    const userCred = await signInWithEmailAndPassword(auth, email, password);
-    const userDoc = await getDoc(doc(db, "users", userCred.user.uid));
 
-    if (!userDoc.exists()) {
-      errorBox.innerText = "User data not found in Firestore!";
-      return;
+    const userCred = await signInWithEmailAndPassword(auth, email.value, password.value);
+
+    const snap = await get(ref(db,"users/"+userCred.user.uid));
+
+    if(!snap.exists() || snap.val().role !== "admin"){
+        errorBox.innerText="Not registered as Admin!";
+        return;
     }
 
-    if (userDoc.data().role !== "admin") {
-      errorBox.innerText = "You are not registered as a Admin!";
-      return;
-    }
-
-    successBox.innerText = "Login successful! Redirecting...";
-    setTimeout(() => {
-      window.location.href = "admin-dashboard.html";
-    }, 700);
+    successBox.innerText="Login successful!";
+    setTimeout(()=>window.location.href="admin-dashboard.html",700);
 
   } catch (error) {
-    errorBox.innerText = error.message;
+    errorBox.innerText=error.message;
   }
 });
 </script>
-
 </body>
 </html>
