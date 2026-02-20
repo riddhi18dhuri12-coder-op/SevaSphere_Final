@@ -84,11 +84,12 @@ a{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-z1Zx-0qAj6_FGiclcXFdIjiKSjXlUKw",
   authDomain: "sevasphere-6dce7.firebaseapp.com",
+  databaseURL: "https://sevasphere-6dce7-default-rtdb.asia-southeast1.firebasedatabase.app/",
   projectId: "sevasphere-6dce7",
   storageBucket: "sevasphere-6dce7.appspot.com",
   messagingSenderId: "930986469572",
@@ -97,40 +98,28 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
-
-const signupForm = document.getElementById("signupForm");
-const errorBox = document.getElementById("error");
-const successBox = document.getElementById("success");
+const db = getDatabase(app);
 
 signupForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  errorBox.innerText = "";
-  successBox.innerText = "";
 
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
   try {
-    // Create user in Firebase Auth
+
     const userCred = await createUserWithEmailAndPassword(auth, email, password);
 
-    // Store user data in Firestore
-    await setDoc(doc(db, "users", userCred.user.uid), {
-      name: name,
-      email: email,
+    await set(ref(db, "users/" + userCred.user.uid), {
+      name,
+      email,
       role: "admin",
-      createdAt: new Date()
+      createdAt: Date.now()
     });
 
-    successBox.innerText = "Account created successfully! Redirecting...";
-    
-    // Redirect to dashboard after 1 second
-    setTimeout(() => {
-      window.location.href = "admin-dashboard.html";
-    }, 1000);
+    successBox.innerText = "Account created successfully!";
+    setTimeout(()=> window.location.href="admin-dashboard.html",1000);
 
   } catch (error) {
     errorBox.innerText = error.message;
