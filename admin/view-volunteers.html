@@ -1,142 +1,200 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>View Volunteers | SevaSphere</title>
-  <link rel="stylesheet" href="../assets/css/style.css">
+  <title>View Applications | SevaSphere</title>
+
   <style>
     body {
-      background: linear-gradient(135deg, #52b69a, #168aad); /* Admin palette gradient */
-      min-height: 100vh;
-      font-family: "Segoe UI", sans-serif;
-      padding: 25px;
-      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      background:#f4f7fb;
+      padding:30px;
     }
 
     h2 {
-      text-align: center;
-      margin-bottom: 20px;
+      color:#1e6091;
     }
 
-    #volunteersContainer > div {
-      background: rgba(255, 255, 255, 0.15); /* translucent cards */
-      backdrop-filter: blur(20px);
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 12px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: white; /* ensures text visibility */
+    .event-block {
+      background:white;
+      padding:20px;
+      border-radius:15px;
+      margin-bottom:25px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.08);
     }
 
-    #volunteersContainer h3 {
-      margin: 0 0 8px 0;
-      font-size: 18px;
-      color: #e0f7fa; /* light accent for heading */
+    .app-card {
+      background:#eef6fb;
+      padding:15px;
+      border-radius:10px;
+      margin-top:10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
     }
 
-    #volunteersContainer p {
-      margin: 4px 0;
-      opacity: 0.9;
+    .name-link {
+      font-weight:600;
+      color:#1e6091;
+      cursor:pointer;
     }
+
+    .btn {
+      padding:6px 12px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+      margin-left:8px;
+    }
+
+    .accept { background:#52b69a; color:white; }
+    .reject { background:#ef4444; color:white; }
   </style>
 </head>
+
 <body>
 
-  <h2>NGO - Volunteer Applications</h2>
+<h2>📂 Event Applications</h2>
+<div id="applicationsContainer"></div>
 
-  <div id="volunteersContainer" style="width:80%; margin:auto;"></div>
+<script type="module">
 
-  <script src="../assets/js/data.js"></script>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getDatabase, ref, onValue, update, get } 
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
-<script>
-const container = document.getElementById("volunteersContainer");
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_DOMAIN",
+  databaseURL: "YOUR_DATABASE_URL",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_BUCKET",
+  messagingSenderId: "YOUR_ID",
+  appId: "YOUR_APP_ID"
+};
 
-function loadVolunteers() {
-  let events = JSON.parse(localStorage.getItem("events")) || [];
-  let applications = JSON.parse(localStorage.getItem("applications")) || [];
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const container = document.getElementById("applicationsContainer");
+
+let allEvents = {};
+let allApplications = {};
+let allUsers = {};
+let currentUser = null;
+
+
+// AUTH CHECK (Admin Only)
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    alert("Login required");
+    window.location.href = "admin-login.html";
+    return;
+  }
+
+  currentUser = user;
+
+  loadData();
+});
+
+
+// FETCH DATA REALTIME
+function loadData() {
+
+  onValue(ref(db, "events"), snap => {
+    allEvents = snap.val() || {};
+    renderApplications();
+  });
+
+  onValue(ref(db, "applications"), snap => {
+    allApplications = snap.val() || {};
+    renderApplications();
+  });
+
+  onValue(ref(db, "users"), snap => {
+    allUsers = snap.val() || {};
+    renderApplications();
+  });
+}
+
+
+// RENDER APPLICATIONS
+function renderApplications() {
 
   container.innerHTML = "";
 
-  events.forEach(event => {
-    let eventApps = applications.filter(app => app.eventId === event.id);
+  Object.entries(allEvents).forEach(([eventId, event]) => {
 
-    let div = document.createElement("div");
+    // Only show events created by this admin
+    if (event.createdBy !== currentUser.uid) return;
 
-    div.innerHTML = `
-      <h3>${event.title}</h3>
-      <p><b>Total Applications:</b> ${eventApps.length}</p>
-      <button onclick="toggleApplications('${event.id}')" 
-        style="margin-top:10px;padding:8px 15px;border:none;border-radius:6px;background:#d9ed92;color:#184E77;font-weight:bold;cursor:pointer;">
-        View Applications
-      </button>
-      <div id="apps-${event.id}" style="margin-top:15px;display:none;"></div>
-    `;
+    const eventDiv = document.createElement("div");
+    eventDiv.className = "event-block";
 
-    container.appendChild(div);
-  });
-}
+    eventDiv.innerHTML = `<h3>${event.title}</h3>`;
 
-function toggleApplications(eventId) {
-  let applications = JSON.parse(localStorage.getItem("applications")) || [];
-  let eventApps = applications.filter(app => app.eventId === eventId);
-  let appContainer = document.getElementById(`apps-${eventId}`);
+    const eventApps = Object.entries(allApplications)
+      .filter(([appId, app]) => app.eventId === eventId);
 
-  if (appContainer.style.display === "block") {
-    appContainer.style.display = "none";
-    return;
-  }
-
-  appContainer.style.display = "block";
-  appContainer.innerHTML = "";
-
-  if (eventApps.length === 0) {
-    appContainer.innerHTML = "<p>No applications yet.</p>";
-    return;
-  }
-
-  eventApps.forEach(app => {
-    let status = app.status || "Pending";
-
-    let card = document.createElement("div");
-    card.style.background = "rgba(255,255,255,0.2)";
-    card.style.padding = "10px";
-    card.style.marginBottom = "10px";
-    card.style.borderRadius = "8px";
-
-    card.innerHTML = `
-      <p><b>Name:</b> ${app.name}</p>
-      <p><b>Email:</b> ${app.email}</p>
-      <p><b>Status:</b> <span id="status-${app.id}">${status}</span></p>
-      <button onclick="updateStatus('${app.id}','Accepted')" 
-        style="margin-right:10px;padding:6px 12px;border:none;border-radius:5px;background:#38b000;color:white;cursor:pointer;">
-        Accept
-      </button>
-      <button onclick="updateStatus('${app.id}','Rejected')" 
-        style="padding:6px 12px;border:none;border-radius:5px;background:#d00000;color:white;cursor:pointer;">
-        Reject
-      </button>
-    `;
-
-    appContainer.appendChild(card);
-  });
-}
-
-function updateStatus(appId, newStatus) {
-  let applications = JSON.parse(localStorage.getItem("applications")) || [];
-
-  applications = applications.map(app => {
-    if (app.id === appId) {
-      app.status = newStatus;
+    if (eventApps.length === 0) {
+      eventDiv.innerHTML += "<p>No applications yet.</p>";
     }
-    return app;
+
+    eventApps.forEach(([appId, app]) => {
+
+      const volunteer = allUsers[app.volunteerId];
+      if (!volunteer) return;
+
+      const appCard = document.createElement("div");
+      appCard.className = "app-card";
+
+      appCard.innerHTML = `
+        <div>
+          <span class="name-link" onclick="viewProfile('${app.volunteerId}')">
+            ${volunteer.name}
+          </span>
+          <div>Status: ${app.status}</div>
+        </div>
+
+        <div>
+          <button class="btn accept"
+            onclick="updateStatus('${appId}', 'Accepted')">
+            Accept
+          </button>
+
+          <button class="btn reject"
+            onclick="updateStatus('${appId}', 'Rejected')">
+            Reject
+          </button>
+        </div>
+      `;
+
+      eventDiv.appendChild(appCard);
+    });
+
+    container.appendChild(eventDiv);
   });
 
-  localStorage.setItem("applications", JSON.stringify(applications));
-
-  document.getElementById(`status-${appId}`).innerText = newStatus;
 }
 
-loadVolunteers();
+
+// ACCEPT / REJECT
+window.updateStatus = async function(appId, status) {
+
+  await update(ref(db, "applications/" + appId), {
+    status: status
+  });
+
+};
+
+
+// VIEW PROFILE
+window.viewProfile = function(uid) {
+  window.location.href = "../volunteer/profile.html?uid=" + uid;
+};
+
 </script>
 
 </body>
