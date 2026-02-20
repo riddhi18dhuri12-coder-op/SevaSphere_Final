@@ -2,69 +2,79 @@
 <html>
 <head>
   <title>Create Event | SevaSphere</title>
-  <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:"Segoe UI", sans-serif;
-    }
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Segoe UI", sans-serif;
+}
 
-    body{
-      background: linear-gradient(135deg,#d9ed92,#b5e48c,#76c893,#52b69a,#34a0a4);
-      min-height:100vh;
-      padding:25px;
-      color:#1b1b1b;
-    }
+body{
+  background:linear-gradient(135deg,#168AAD,#52B69A);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
 
-    h2{
-      text-align:center;
-      color:#1e6091;
-      margin-bottom:20px;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-    }
+.form-wrapper{
+  width:100%;
+  max-width:600px;
+}
 
-    .form-container{
-      width:60%;
-      margin:auto;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(18px);
-      border-radius:16px;
-      padding:25px;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.25);
-    }
+h2{
+  text-align:center;
+  color:white;
+  margin-bottom:25px;
+  font-weight:600;
+}
 
-    input, textarea{
-      width:100%;
-      padding:12px;
-      margin-bottom:12px;
-      border:none;
-      border-radius:10px;
-      outline:none;
-      font-size:14px;
-    }
+.form-container{
+  background:white;
+  padding:30px;
+  border-radius:18px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.2);
+}
 
-    button{
-      width:100%;
-      padding:12px;
-      border:none;
-      border-radius:10px;
-      font-weight:700;
-      background:#168aad;
-      color:white;
-      cursor:pointer;
-      transition:0.2s;
-    }
+input, textarea{
+  width:100%;
+  padding:12px 14px;
+  margin-bottom:15px;
+  border:1px solid #e0e0e0;
+  border-radius:10px;
+  font-size:14px;
+  transition:0.2s;
+}
 
-    button:hover{
-      background:#1a759f;
-    }
+input:focus, textarea:focus{
+  border-color:#168AAD;
+  outline:none;
+  box-shadow:0 0 0 2px rgba(22,138,173,0.15);
+}
 
-    textarea{
-      resize: vertical;
-      min-height:80px;
-    }
-  </style>
+textarea{
+  resize:vertical;
+  min-height:90px;
+}
+
+button{
+  width:100%;
+  padding:13px;
+  border:none;
+  border-radius:12px;
+  font-weight:600;
+  background:#168AAD;
+  color:white;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+button:hover{
+  background:#126782;
+}
+</style>
 </head>
 <body>
 
