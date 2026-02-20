@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -124,12 +125,11 @@ body{
     <div class="sidebar">
         <h2>🌍 SevaSphere</h2>
 
-        <a href="volunteer-dashboard.html">Dashboard</a>
-        <a href="events.html">Browse Events</a>
-        <a href="my-applications.html">My Applications</a>
-
-        <a href="certificates/certificate.html">🎓 Certificate Generator</a>
-
+      <a href="volunteer-dashboard.html">Dashboard</a>
+<a href="events.html">Browse Events</a>
+<a href="my-applications.html">My Applications</a>
+<a href="chat.html"> Chats</a>
+<a href="certificates/certificate.html">Certificate Generator</a>
         <br>
         <a href="#" id="logoutBtn">Logout</a>
     </div>
@@ -197,14 +197,10 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 
 function isUpcoming(dateStr){
-    if(!dateStr) return false;
-
     const today = new Date();
     today.setHours(0,0,0,0);
-
     const eventDate = new Date(dateStr);
     eventDate.setHours(0,0,0,0);
-
     return eventDate >= today;
 }
 
@@ -215,51 +211,48 @@ onAuthStateChanged(auth, async (user)=>{
         return;
     }
 
-    // 🔥 Get user data from Realtime Database
     const userSnap = await get(ref(db,"users/"+user.uid));
-
-    if(!userSnap.exists() || userSnap.val().role !== "volunteer"){
-        window.location.href="../index.html";
-        return;
-    }
-
     const userData = userSnap.val();
 
     document.getElementById("volunteerName").innerText =
         "Hi, " + userData.name + " 👋";
 
-    // 🔥 Get all events
+    // 🔹 GET EVENTS
     const eventsSnap = await get(ref(db,"events"));
-    let totalEvents = 0;
-    let upcomingCount = 0;
+    const events = eventsSnap.exists() ? eventsSnap.val() : {};
 
-    if(eventsSnap.exists()){
-        const events = eventsSnap.val();
-        totalEvents = Object.keys(events).length;
+    document.getElementById("totalEvents").innerText =
+        Object.keys(events).length;
 
-        Object.values(events).forEach(ev=>{
-            if(isUpcoming(ev.date)) upcomingCount++;
-        });
-    }
-
-    document.getElementById("totalEvents").innerText = totalEvents;
-    document.getElementById("upcomingEvents").innerText = upcomingCount;
-
-    // 🔥 Get applications of this volunteer
+    // 🔹 GET APPLICATIONS
     const appsSnap = await get(ref(db,"applications"));
-    let myAppsCount = 0;
+    const applications = appsSnap.exists() ? appsSnap.val() : {};
 
-    if(appsSnap.exists()){
-        const applications = appsSnap.val();
+    let myApplicationsCount = 0;
+    let acceptedUpcomingCount = 0;
 
-        Object.values(applications).forEach(app=>{
-            if(app.volunteerId === user.uid){
-                myAppsCount++;
+    Object.values(applications).forEach(app=>{
+
+        if(app.volunteerId === user.uid){
+
+            myApplicationsCount++;
+
+            if(app.status === "Accepted"){
+                const event = events[app.eventId];
+
+                if(event && isUpcoming(event.date)){
+                    acceptedUpcomingCount++;
+                }
             }
-        });
-    }
+        }
 
-    document.getElementById("myApplications").innerText = myAppsCount;
+    });
+
+    document.getElementById("myApplications").innerText =
+        myApplicationsCount;
+
+    document.getElementById("upcomingEvents").innerText =
+        acceptedUpcomingCount;
 
 });
 
@@ -270,6 +263,5 @@ document.getElementById("logoutBtn").addEventListener("click", async (e)=>{
     window.location.href="../index.html";
 });
 </script>
-
 </body>
 </html>
